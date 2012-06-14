@@ -15,6 +15,7 @@ containing an element for each network that's allowed to talk to this service:
     $allowed_networks = ['10.0.0.0/8', '192.168.0.0/24']
 
 I know what my firewall definition should look like..
+
     firewall { '100 allow <network> to apache on ports 80':
       'proto'  => 'tcp',
       'action' => 'accept',
@@ -23,12 +24,14 @@ I know what my firewall definition should look like..
     }
 
 Now... if I could just do this:
+
     $allowed_networks.each do |network|
       firewall {....
       }
     end
 
 But I can't. Yes, I could write a define like this:
+
     define my_apache_firewall_wrapper() {
       firewall { "100 allow ${name} to apache on ports 80":
         'proto'  => 'tcp',
@@ -39,6 +42,7 @@ But I can't. Yes, I could write a define like this:
     }
 
 And use it like this:
+
   my_apache_firewall_wrapper{ $allowed_networks: }
 
 And it would be called once for each element of $allowed_networks, win.. no?
@@ -55,19 +59,23 @@ Why?
 So i've written some simple functions to perform loop like tasks within puppet
 
 Enter the function: create_resources_hash_from
-create_resources_hash_from(
-  <a formatted string>,
-  <an array to loop on>,
-  <a hash to template your resource>,
-  [an optional array of parameters to add to each resource])
+
+    create_resources_hash_from(
+      <a formatted string>,
+      <an array to loop on>,
+      <a hash to template your resource>,
+      [an optional array of parameters to add to each resource])
 
 So lets start with our allowed_hosts array again:
+
     $allowed_networks = ['10.0.0.0/8', '192.168.0.0/24']
 
 Then a formatting string for the name of your resource:
+
     $resource_name = "100 allow %s to apache on ports 80"
 
 A hash laying out a template for each resource that you wish to create:
+
     $my_resource_hash = {
       'proto'  => 'tcp',
       'action' => 'accept',
@@ -76,12 +84,12 @@ A hash laying out a template for each resource that you wish to create:
 
 And a list of parameters that you wish to have added to your resource based
 on the thing that you're looping on:
-    $dynamic_parameters = ['source']
 
-    $my_resources_hash = create_resources_hash_from($resource_name, $allowed_hosts, $my_resource_hash, $dynamic_parameters)
+    $dynamic_parameters = ['source']
 
 Then simply pass your new hash and the name of the resource that you wish to
 create to create_resources:
+
     create_resources(firewall, $my_resources_hash)
 
 Much nicer.. at least IMHO :-)
