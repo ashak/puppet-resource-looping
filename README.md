@@ -92,6 +92,7 @@ Use each of these variables with our new function:
     $created_resource_hash = create_resources_hash_from($resource_name, $allowed_hosts, $my_resource_hash, $dynamic_parameters)
 
 At this moment in time $created_resource_hash now contains:
+
     {
       '100 allow 10.0.0.0/8 to apache on ports 80' => {
         'proto' => 'tcp',
