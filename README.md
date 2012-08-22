@@ -111,6 +111,6 @@ At this moment in time $created_resource_hash now contains:
 Then simply pass your new hash and the name of the resource that you wish to
 create to create_resources:
 
-    create_resources(firewall, $my_resources_hash)
+    create_resources(firewall, $created_resource_hash)
 
 Much nicer.. at least IMHO :-)
