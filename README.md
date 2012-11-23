@@ -64,7 +64,8 @@ Enter the function: create_resources_hash_from
       <a formatted string>,
       <an array to loop on>,
       <a hash to template your resource>,
-      [an optional array of parameters to add to each resource])
+      [an optional hash containing parameter names as keys and formatted
+        strings as values to add to each resource])
 
 So lets start with our allowed_hosts array again:
 
@@ -82,10 +83,12 @@ A hash laying out a template for each resource that you wish to create:
       'dport'  => 80
     }
 
-And a list of parameters that you wish to have added to your resource based
+And a hash of parameters that you wish to have added to your resource based
 on the thing that you're looping on:
 
-    $dynamic_parameters = ['source']
+    $dynamic_parameters = {
+      'source' => '%s'
+    }
 
 Use each of these variables with our new function:
 
