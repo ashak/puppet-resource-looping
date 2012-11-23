@@ -20,8 +20,9 @@ Given:
     A formatted string (to use as the resource name)
     An array to loop through (because puppet cannot loop)
     A hash defining the parameters for a resource
-    And optionally an array of parameter names to add to the resource that will
-      be configured with the current element of the loop array
+    And optionally an hash of parameter names to add to the resource and an
+      associated formatted string that should be configured with the current
+      element of the loop array
 
 This function will return a hash of hashes that can be used with the
 create_resources function.
@@ -34,7 +35,9 @@ create_resources function.
       'action' => 'accept',
       'dport'  => 80
     }
-    $dynamic_parameters = ['source']
+    $dynamic_parameters = {
+      'source' => '%s'
+    }
 
     $created_resource_hash = create_resources_hash_from($resource_name, $allowed_hosts, $my_resource_hash, $dynamic_parameters)
 
@@ -85,8 +88,8 @@ with a loop of some description.
 
     if arguments.size == 4
       dynamic_parameters = arguments[3]
-      unless dynamic_parameters.is_a?(Array)
-        raise(Puppet::ParseError, 'create_resources_hash_from(): fourth argument must be an array')
+      unless dynamic_parameters.is_a?(Hash)
+        raise(Puppet::ParseError, 'create_resources_hash_from(): fourth argument must be a hash')
       end
     end
 
@@ -95,11 +98,11 @@ with a loop of some description.
     loop_array.each do |i|
       my_resource_hash = resource_hash.clone
       if dynamic_parameters
-        dynamic_parameters.each do |param|
+        dynamic_parameters.each do |param, value|
           if my_resource_hash.member?(param)
             raise(Puppet::ParseError, "create_resources_hash_from(): dynamic_parameter '#{param}' already exists in resource hash")
           end
-          my_resource_hash[param] = i
+          my_resource_hash[param] = sprintf(value,[i])
         end
       end
       result[sprintf(formatted_string,[i])] = my_resource_hash
